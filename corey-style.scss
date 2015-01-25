@@ -1,0 +1,490 @@
+$brown: #B88E74;
+$red: rgb(200, 93, 55);
+$string: rgb(135,155,116);
+$purple: rgb(154,132,158);
+$orange: rgba(255, 126, 86, 0.69);
+$blue: rgb(117, 135, 166);
+$background: #2F3737;
+$slightly-lighter: rgba(130, 130, 130, 0.2);
+$yellow: #c9b18e;
+$js-keyword: rgb(249, 238, 152);
+$comment: rgb(150,150,150);
+$selected: rgba(161, 174, 175, 0.2);
+
+$main-size: 16px;
+$main-line-height: 1.25em;
+$main-font-weight: 200;
+$bigger-line-height: $main-line-height + 0.5em;
+$sub-size: 15px;
+$sub-line-height: 1.25em;
+$thin-lines: 1px solid rgb(120,120,120);
+$darker-width: 1px;
+$darker-thin-lines: $darker-width solid #4C4C4C;
+$glyph-arrow-color: rgb(94,94,94);
+$light-white: rgb(229,229,229);
+$dark-white: rgb(145,145,145);
+
+@function px($em, $base: $main-size) {
+    @return $em/1em * $base;
+}
+
+@mixin main-content-footer {
+	$font-size: $sub-size;
+	flex-basis: px($bigger-line-height, $font-size) + $darker-width !important;
+	&, & * {
+		font-size: $font-size !important;
+		font-weight: $main-font-weight;
+		line-height: $bigger-line-height;
+		color: $dark-white;
+	}
+}
+
+body { /* the body scope is necessary to override built in important selector */
+	.vbox.sources, .vbox.elements, .console-view { /* only target the "Sources" and "Elements" panes */
+		background: $background;
+		* { font-family: 'Source Code Pro' !important; }
+		font-size: $main-size !important;
+		font-weight: $main-font-weight !important;
+		line-height: $main-line-height !important;
+		color: $light-white !important;
+		.monospace { font-size: $main-size !important;  }
+		.source-code { font-size: $main-size !important; }
+		.metrics { line-height: normal }
+	}
+}
+
+.glyph { background-color: $glyph-arrow-color; opacity: 1 !important; }
+.glyph.shadow { display: none; }
+.swatch { 
+	line-height: 0px;
+	border-radius: 50%;
+	.swatch-inner {
+		border-radius: 50%;
+		border: none;
+	}
+}
+
+.toolbar {
+	* { font-family: 'Source Code Pro' !important; }
+	padding: 0;
+	background: $background;
+	border-bottom: $darker-thin-lines;
+	@include main-content-footer;
+	.tabbed-pane-header {
+		border: none !important;
+	}
+	.tabbed-pane-header-tabs {
+		.tabbed-pane-header-tab:nth-child(n-1) { border-left: $darker-thin-lines }
+		.tabbed-pane-header-tab:last-child { border-right: $darker-thin-lines }
+	}
+	.toolbar-controls-left, .toolbar-controls-right {
+		opacity: 1;
+		margin: 0;
+		background: $background;
+	}
+}
+
+#drawer-contents, .vbox.sources, .vbox.elements, .toolbar, #sources-panel-sources-view, 
+.panel.sources .navigator-tabbed-pane {
+
+	.tabbed-pane-header { 
+		background-color: $background;
+		border-bottom: $darker-thin-lines;
+		@include main-content-footer;
+		.tabbed-pane-header-contents { margin: 0 }
+		.tabbed-pane-header-tab {
+			border: none;
+			padding: 0;
+			margin: 0;
+			height: initial;
+			width: initial !important;
+			padding: 0 6px;
+			font-weight: $main-font-weight;
+			&.selected { background: $slightly-lighter; }
+		}
+	}
+
+}
+
+.console-view-wrapper { background: $background }
+
+.console-view-wrapper, .vbox.sources, .vbox.elements {
+	input[type="checkbox"] {
+		position: relative;
+		width: 10px;
+		height: 10px;
+		top: 6px;
+		margin: 0px 6px 0px 0px;
+		border: none;
+		box-shadow: none;
+		&:before {
+			background-color: $background;
+			content: "";
+			height: 100%;
+			width: 100%;
+			position: absolute;
+		}
+		&:after {
+			content: "";
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			font-size: 22px;
+			font-weight: 100;
+			line-height: 7px;
+			border-radius: 50%;
+			color: $light-white;
+			border: 1px $light-white dotted;
+		}
+		&:hover:after {  }
+		&:checked:after { content: ""; background-color: $light-white; border-color: $dark-white; box-shadow: 0px 0px 0px 1px $background inset; }
+		&.enabled-button { left: -38px; }
+	}
+	li.overloaded.disabled { 
+		color: rgba(255,255,255,0.5);
+		.value { color: $light-white; }
+	}
+	.properties-tree li {
+		line-height: $main-line-height !important;
+		padding-top: 0px;
+	}
+	li.parent, .sidebar-pane-title {
+		@mixin arrow {
+			-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
+			-webkit-mask-size: 320px 144px;
+			-webkit-mask-position: -4px -90px;
+			background-color: $glyph-arrow-color;
+			background-position: initial !important;
+			opacity:1 !important;
+			width: 8px !important;
+			height: 20px !important;
+			vertical-align: bottom;
+			margin-right: 4px !important;
+			top: 0px;
+		}
+		@mixin toggled-arrow { -webkit-mask-position: -20px -90px }
+		.expand-element { @include arrow; }
+		&.expanded .expand-element { @include toggled-arrow; }
+		&::before { @include arrow; }
+		&.expanded::before { @include toggled-arrow; }
+
+	}
+	&.expanded { -webkit-mask-position: -20px -90px }
+}
+
+.error-icon-small {
+	background-image: none;
+	position: relative;
+}
+
+.error-icon-small:after, .console-error-level:before {
+	font-family: 'Source Code Pro';
+	content: "x";
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	font-size: 16px;
+	font-weight: 100;
+	line-height: 6px;
+	border-radius: 50%;
+	color: $light-white;
+	background-color: $red;
+	border: 1px $red solid;
+	background-image: none;
+}
+
+.sources-status-bar {
+	@include main-content-footer;
+	background: none !important;
+	border-top: $darker-thin-lines !important;
+
+}
+
+.vbox.sources, .vbox.elements { /* only target the "Sources" and "Elements" panes */
+
+	.section .properties .name, .event-properties .name, .console-object-preview .name  {
+		color: white !important;
+	}
+
+	.webkit-html-pseudo-element {
+		color: $red;
+	}
+
+	span.cm-property { color: white; }
+
+	.cm-execution-line {
+		background-color: rgba(0, 107, 167, 0.86);
+		outline: 1px solid rgba(37, 99, 255, 0.54);
+		background-blend-mode: overlay;
+	}
+
+	$line-number-size: 50px;
+
+	.CodeMirror {
+		line-height: $main-line-height !important; 
+		font-family: 'Source Code Pro' !important;
+		background: $background !important;
+		pre {
+			padding: 0 10px !important; 
+			font-family: 'Source Code Pro' !important; 
+			line-height: $main-line-height !important
+		}
+		.CodeMirror-selected { background-color: $selected !important; }
+		.CodeMirror-cursor { border-left: 1px solid white !important; }
+		.CodeMirror-lines { background: $background; }
+		.CodeMirror-sizer { margin-left: $line-number-size + 1px !important; }
+		.CodeMirror-linenumbers { width: $line-number-size !important; }
+		.CodeMirror-linenumber { font-size: 14px; padding: 0 !important; text-align:center !important; opacity: 0.5; }
+		.CodeMirror-gutters { background-color: $background; border-right: $darker-thin-lines !important; padding-right:0px; }
+
+		@-webkit-keyframes highlight-bg {
+			0% { background-color: $background; }
+			25% { background-color: $selected; }
+			100% { background-color: $background; }
+		}
+		.cm-highlight {
+			-webkit-animation: "highlight-bg" 1.5s 0s !important;
+		}
+
+		.cm-s-web-inspector-html .CodeMirror-code pre { max-width: 100%; }
+
+		@-webkit-keyframes corey {
+			0% { background-color: rgb(255, 224, 0); color: black; }
+			100% { background-color: transparent; color: white; } 
+		}
+		.CodeMirror-matchingbracket { 
+			-webkit-animation: "corey" 0.5s 0.3s !important; 
+			border-radius: 3px !important; 
+			padding: 2px 0px; 
+			color: white !important; 
+			border: none !important;
+		}
+		.CodeMirror-nonmatchingbracket { color: white !important; }
+	}
+
+	.CodeMirror-code pre, .webkit-css-keyword, .cm-css-operator, .cm-js-operator, .webkit-css-operator { color: $light-white !important; }
+	.cm-css-def, .cm-js-def, .webkit-css-def, .webkit-css-selector, .cm-css-builtin, .cm-css-qualifier, .cm-css-keyword { color: $yellow !important; }
+	.cm-css-property, .cm-js-property, .webkit-css-property, .cm-css-meta { color: $purple !important; }
+	.cm-css-string-2, .cm-js-string-2, .webkit-css-string-2, .cm-keyword { color: $yellow !important; }
+	.cm-css-comment, .cm-js-comment, .webkit-css-comment { color: $comment !important; }
+	.cm-css-number, .cm-js-number, .webkit-css-number, .cm-css-atom, .cm-js-atom, .webkit-css-atom  { color: $yellow !important;}
+	.cm-css-string, .cm-js-string, .webkit-css-string, .cm-string { color: $string !important }
+	.cm-css-attribute, .cm-js-attribute, .webkit-css-attribute { color: $brown !important; }
+	.cm-css-tag, .cm-js-tag, .webkit-css-tag { color: $brown !important; }
+	.cm-css-variable, .cm-js-variable, .webkit-css-variable, .cm-variable { color: $blue !important; }
+
+	.cm-comment, .cm-xml-comment { color: $comment !important; }
+	.cm-variable, .cm-meta { color: $light-white !important; }
+	.cm-operator, .cm-js-keyword { color: $yellow !important; }
+	.cm-number { color: $red !important; }
+	.cm-builtin { color: $yellow !important; }
+	.cm-atom { color: $red !important; }
+
+	#elements-content { background-color: $background; }
+
+	#elements-crumbs {
+		border-top: $darker-thin-lines;
+		background-color: $background;
+		@include main-content-footer;
+		.crumbs .crumb {
+			height: initial;
+		}
+		.crumbs .crumb:hover {
+			background-color: $background;
+		}
+		.crumbs .crumb.selected, .crumbs .crumb.selected:hover, .crumbs .crumb:hover {
+			font-weight: 300;
+		}
+		.crumb, span.extra { text-shadow: none; }
+		.crumbs .crumb.selected, .crumbs .crumb.selected:hover {
+			background-color: $slightly-lighter !important;
+		}
+		.crumb:nth-child(n+2) { border-left: $darker-thin-lines }
+	}
+	.webkit-html-tag-name, .webkit-html-tag, .webkit-html-attribute-name, .cm-xml-tag, .cm-xml-attribute { color: $yellow !important }
+	.webkit-html-attribute-value, .webkit-html-attribute a, .cm-xml-string { color: $string !important; }
+	.highlight, .webkit-html-text-node { color: $comment !important; }
+	.webkit-html-comment { color: $comment !important; }
+	.outline-disclosure li {
+		white-space: nowrap;
+		&.selected .selection {
+			z-index:0 !important;
+			pointer-events: none;
+			background-color: $selected !important;
+		}
+		&.hovered:not(.selected) .selection { background: rgba(255, 255, 255, 0.1); }
+	}
+	.webkit-html-external-link, .webkit-html-resource-link {
+		color: #A3AD92;
+	}
+
+	.split-view-resizer-border {
+		border-left: $darker-thin-lines !important;
+	}
+
+	.split-view-sidebar {
+		.sidebar-pane-title {
+			@include main-content-footer;
+			background: none;
+			border-top: $darker-thin-lines;
+			border-bottom: $darker-thin-lines; 
+			height: initial;
+		}
+
+		.scripts-debug-toolbar-drawer { border-bottom: $darker-thin-lines }
+		.scripts-debug-toolbar { background: $background }
+
+		.sidebar-pane-filter-box {
+			border-top: $darker-thin-lines !important;
+			@include main-content-footer;
+			&.styles-filter-engaged {
+				background-color: $slightly-lighter;
+			}
+		}
+
+		.style-panes-wrapper {
+
+			.sidebar-pane-toolbar > .pane-title-button, .sidebar-pane-button-new-rule {
+				-webkit-mask-image: url('chrome-extension://__MSG_@@extension_id__/images/paneAddButtons.png');
+				&.element-state { -webkit-mask-image: url('chrome-extension://__MSG_@@extension_id__/images/paneElementStateButtons.png') }
+				-webkit-mask-size: 23px 17px;
+				background-image: none;
+				background: $glyph-arrow-color;
+			}
+
+			.styles-section {
+				.filter-match { background-color: $slightly-lighter }
+				.simple-selector.selector-matches {
+					color: $dark-white !important;
+				}
+			}
+
+			.styles-section.read-only:not(.computed-style) {
+				background: $background;	
+			}
+
+			.styles-section {
+				border-bottom: $darker-thin-lines !important;
+			}
+
+			.styles-section, .sidebar-pane-filter-box {
+				border-left: $darker-thin-lines !important;
+			}
+
+			.sidebar-separator {
+				background-color: $background;
+				border-bottom: $darker-thin-lines !important;
+				@include main-content-footer;
+				color: $light-white !important;
+			}
+
+		}
+
+		.metrics-and-computed .metrics {
+			border-bottom: $darker-thin-lines !important;
+		}
+	}
+
+}
+
+.split-view-resizer-border { 
+	border-top: $darker-thin-lines !important;
+}
+
+/* Console Start */
+
+.console-view {
+
+	.console-object-preview { color: white }
+
+	.section .properties .name, .event-properties .name, .console-object-preview .name {
+		color: $purple;
+	}
+
+	.console-formatted-string, .console-formatted-regexp, .console-formatted-symbol {
+		color: $red;
+	}
+
+	.console-group-messages .outline-disclosure, .console-group-messages .outline-disclosure ol {
+		line-height: $main-line-height;
+	}
+
+	#console-messages {
+		$main-line-height: 23px;
+		border-top: $darker-thin-lines;
+		#console-prompt {
+			&::before { background-position: -192px -107px; }
+			min-height: $main-line-height;
+			line-height: $main-line-height;
+		}
+		.console-message, .console-user-command {
+			border-bottom: $darker-thin-lines;
+		}
+		.console-message, .console-user-command, .console-object-preview {
+			min-height: $main-line-height;
+			line-height: $main-line-height;
+		}
+	}
+
+	.status-bar-item { //prepend select?
+		$subtle-gray: rgb(136, 136, 136);
+		&.select { margin-right: -13px; }
+		color: $subtle-gray !important;
+		text-shadow: none !important;
+		& > .glyph {
+			.status-bar-item > .glyph {
+				opacity: 0.3;
+				background-color: white;
+			}
+		}
+	}
+
+	.status-bar-select-arrow {
+		border-top: rgb(136, 136, 136) 8px solid;
+		border-left: transparent 6px solid;
+		border-right: transparent 6px solid;
+		margin-top: 8px;
+	}
+
+	.console-user-command > .console-message-text {
+		color: inherit;
+	}
+
+	.console-debug-level .console-message-text {
+		color: inherit;
+	}
+
+	.console-error-level .console-message-text, .console-error-level .section > .header .title {
+		line-height: $main-line-height;
+	    color: $red !important;
+	    font-weight: 500;
+	}
+
+	// .outline-disclosure li.parent, .section div.header.monospace {
+	// 	&::before {
+	// 		-webkit-user-select: none;
+	// 		-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
+	// 		-webkit-mask-position: -4px -96px;
+	// 		-webkit-mask-size: 320px 144px;
+	// 		content: "a";
+	// 		color: transparent;
+	// 		text-shadow: none;
+	// 		position: relative;
+	// 		top: 4px;
+	// 		margin-right: 1px;
+	// 		height: 12px;
+	// 		opacity: 1;
+	// 		background-color: rgb(94,94,94);
+	// 	}
+	// }
+
+	.outline-disclosure li.parent.expanded, .section.expanded div.header.monospace {
+		
+		&::before {
+			-webkit-mask-position: -20px -96px;
+		}
+	}
+
+}
+
+/* Console End */

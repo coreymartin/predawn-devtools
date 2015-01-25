@@ -1,0 +1,22 @@
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+*.psd
+*.ai
+*.psb
+psd/
+
+.sass-cache/
+*.scssc
+
+*.sublime-workspace
+
+# ignore composer libraries
+composer.lock
+
+node_modules/
