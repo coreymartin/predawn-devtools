@@ -1,3 +1,7 @@
+@function px($em, $base: $main-size) {
+    @return $em/1em * $base;
+}
+
 $brown: #B88E74;
 $red: rgb(200, 93, 55);
 $string: rgb(135,155,116);
@@ -15,23 +19,21 @@ $main-size: 16px;
 $main-line-height: 1.25em;
 $main-font-weight: 200;
 $bigger-line-height: $main-line-height + 0.5em;
+$bigger-px: px($bigger-line-height, $main-size);
+@warn $bigger-px;
 $sub-size: 15px;
 $sub-line-height: 1.25em;
 $thin-lines: 1px solid rgb(120,120,120);
 $darker-width: 1px;
 $darker-thin-lines: $darker-width solid #4C4C4C;
-$glyph-arrow-color: rgb(94,94,94);
+
 $light-white: rgb(229,229,229);
 $dark-white: rgb(145,145,145);
+$darker-white: rgb(94,94,94);
 
-@function px($em, $base: $main-size) {
-    @return $em/1em * $base;
-}
-
-@mixin main-content-footer {
-	$font-size: $sub-size;
+@mixin main-content-footer($font-size:$sub-size) {
 	flex-basis: px($bigger-line-height, $font-size) + $darker-width !important;
-	&, & * {
+	&, & *, & /deep/ * {
 		font-size: $font-size !important;
 		font-weight: $main-font-weight;
 		line-height: $bigger-line-height;
@@ -39,29 +41,71 @@ $dark-white: rgb(145,145,145);
 	}
 }
 
-body { /* the body scope is necessary to override built in important selector */
-	.vbox.sources, .vbox.elements, .console-view { /* only target the "Sources" and "Elements" panes */
-		background: $background;
-		* { font-family: 'Source Code Pro' !important; }
-		font-size: $main-size !important;
-		font-weight: $main-font-weight !important;
-		line-height: $main-line-height !important;
-		color: $light-white !important;
-		.monospace { font-size: $main-size !important;  }
-		.source-code { font-size: $main-size !important; }
-		.metrics { line-height: normal }
+html {
+	.styles-pane, .vbox.sources, .vbox.elements, .platform-mac .console-view { /* only target the "Sources" and "Elements" panes */
+		&, .tabbed-pane-content { background: $background }
+		& /deep/ .platform-mac, & {
+			* { font-family: 'Source Code Pro' !important; }
+			font-size: $main-size !important;
+			font-weight: $main-font-weight !important;
+			line-height: $main-line-height !important;
+			color: $dark-white !important;
+			.monospace { font-size: $main-size !important;  }
+			.source-code { font-size: $main-size !important; }
+			.metrics { line-height: normal }
+		}
 	}
 }
 
-.glyph { background-color: $glyph-arrow-color; opacity: 1 !important; }
+::selection, ol.watch-expressions > li.hovered, .CodeMirror-selected { background: $selected !important; }
+
+.glyph { background-color: $darker-white; opacity: 1 !important; }
 .glyph.shadow { display: none; }
+button.status-bar-item, div.status-bar-item {
+	padding:0;
+	height: $bigger-px;
+	.status-bar-counter-item > div {
+		vertical-align: 1px;
+		margin-right: 5px;
+	}
+	&.toggled-on .glyph:not(.shadow) { background-color: $light-white !important }
+}
+
+
 .swatch { 
 	line-height: 0px;
 	border-radius: 50%;
-	.swatch-inner {
-		border-radius: 50%;
-		border: none;
+	overflow: hidden;
+	width: 12px;
+	height: 12px;
+	box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.2);
+	.swatch-inner, .swatch-inner:hover {
+		border:none;
 	}
+}
+
+.tabbed-pane-placeholder { text-shadow: none; color: $comment; }
+
+#drawer-contents, .vbox.sources, .vbox.elements, .toolbar, #sources-panel-sources-view, 
+.panel.sources .navigator-tabbed-pane {
+
+	.tabbed-pane-header { 
+		background-color: $background !important;
+		border-bottom: $darker-thin-lines;
+		@include main-content-footer;
+		.tabbed-pane-header-contents { margin: 0 }
+		.tabbed-pane-header-tab {
+			border: none;
+			padding: 0;
+			margin: 0;
+			height: 27px;
+			width: initial !important;
+			padding: 0 6px;
+			font-weight: $main-font-weight;
+			&.selected { background: $slightly-lighter; }
+		}
+	}
+
 }
 
 .toolbar {
@@ -69,11 +113,13 @@ body { /* the body scope is necessary to override built in important selector */
 	padding: 0;
 	background: $background;
 	border-bottom: $darker-thin-lines;
-	@include main-content-footer;
+	@include main-content-footer($font-size:$main-size);
 	.tabbed-pane-header {
 		border: none !important;
+		@include main-content-footer($font-size:$main-size);
 	}
 	.tabbed-pane-header-tabs {
+		.tabbed-pane-header-tab { height: $bigger-px }
 		.tabbed-pane-header-tab:nth-child(n-1) { border-left: $darker-thin-lines }
 		.tabbed-pane-header-tab:last-child { border-right: $darker-thin-lines }
 	}
@@ -84,31 +130,14 @@ body { /* the body scope is necessary to override built in important selector */
 	}
 }
 
-#drawer-contents, .vbox.sources, .vbox.elements, .toolbar, #sources-panel-sources-view, 
-.panel.sources .navigator-tabbed-pane {
-
-	.tabbed-pane-header { 
-		background-color: $background;
-		border-bottom: $darker-thin-lines;
-		@include main-content-footer;
-		.tabbed-pane-header-contents { margin: 0 }
-		.tabbed-pane-header-tab {
-			border: none;
-			padding: 0;
-			margin: 0;
-			height: initial;
-			width: initial !important;
-			padding: 0 6px;
-			font-weight: $main-font-weight;
-			&.selected { background: $slightly-lighter; }
-		}
-	}
-
+li.overloaded { 
+	color: $comment;
+	.value { color: $light-white; }
 }
 
 .console-view-wrapper { background: $background }
 
-.console-view-wrapper, .vbox.sources, .vbox.elements {
+.console-view-wrapper, .vbox.sources, .vbox.elements /deep/ {
 	input[type="checkbox"] {
 		position: relative;
 		width: 10px;
@@ -137,23 +166,37 @@ body { /* the body scope is necessary to override built in important selector */
 			border: 1px $light-white dotted;
 		}
 		&:hover:after {  }
-		&:checked:after { content: ""; background-color: $light-white; border-color: $dark-white; box-shadow: 0px 0px 0px 1px $background inset; }
+		&:checked:after { 
+			content: ""; 
+			background-color: rgba($light-white, 0.9);
+			border-color: $dark-white; 
+			box-shadow: 0px 0px 0px 1px black inset; 
+		}
 		&.enabled-button { left: -38px; }
-	}
-	li.overloaded.disabled { 
-		color: rgba(255,255,255,0.5);
-		.value { color: $light-white; }
 	}
 	.properties-tree li {
 		line-height: $main-line-height !important;
 		padding-top: 0px;
 	}
-	li.parent, .sidebar-pane-title {
+	.navigator {
+		color: $comment;
+		.icon {
+			width: 20px;
+			height: 20px;
+			float: left;
+			padding: 2px;
+		}
+		li {
+			line-height: $main-line-height;
+			&, &.selected .selection { height: $main-line-height }
+		}
+	}
+	li.parent, .sidebar-pane-title, .events-pane .section .header.monospace {
 		@mixin arrow {
 			-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
 			-webkit-mask-size: 320px 144px;
-			-webkit-mask-position: -4px -90px;
-			background-color: $glyph-arrow-color;
+			-webkit-mask-position: -4px -91px;
+			background-color: $darker-white;
 			background-position: initial !important;
 			opacity:1 !important;
 			width: 8px !important;
@@ -169,7 +212,7 @@ body { /* the body scope is necessary to override built in important selector */
 		&.expanded::before { @include toggled-arrow; }
 
 	}
-	&.expanded { -webkit-mask-position: -20px -90px }
+	.expanded { -webkit-mask-position: -20px -90px }
 }
 
 .error-icon-small {
@@ -200,7 +243,7 @@ body { /* the body scope is necessary to override built in important selector */
 
 }
 
-.vbox.sources, .vbox.elements { /* only target the "Sources" and "Elements" panes */
+.vbox.sources, .vbox.elements /deep/ { /* only target the "Sources" and "Elements" panes */
 
 	.section .properties .name, .event-properties .name, .console-object-preview .name  {
 		color: white !important;
@@ -229,7 +272,6 @@ body { /* the body scope is necessary to override built in important selector */
 			font-family: 'Source Code Pro' !important; 
 			line-height: $main-line-height !important
 		}
-		.CodeMirror-selected { background-color: $selected !important; }
 		.CodeMirror-cursor { border-left: 1px solid white !important; }
 		.CodeMirror-lines { background: $background; }
 		.CodeMirror-sizer { margin-left: $line-number-size + 1px !important; }
@@ -280,32 +322,19 @@ body { /* the body scope is necessary to override built in important selector */
 	.cm-builtin { color: $yellow !important; }
 	.cm-atom { color: $red !important; }
 
-	#elements-content { background-color: $background; }
-
-	#elements-crumbs {
-		border-top: $darker-thin-lines;
+	#elements-content.elements-wrap { 
 		background-color: $background;
-		@include main-content-footer;
-		.crumbs .crumb {
-			height: initial;
-		}
-		.crumbs .crumb:hover {
-			background-color: $background;
-		}
-		.crumbs .crumb.selected, .crumbs .crumb.selected:hover, .crumbs .crumb:hover {
-			font-weight: 300;
-		}
-		.crumb, span.extra { text-shadow: none; }
-		.crumbs .crumb.selected, .crumbs .crumb.selected:hover {
-			background-color: $slightly-lighter !important;
-		}
-		.crumb:nth-child(n+2) { border-left: $darker-thin-lines }
+		overflow-x: scroll;
+		padding: 0;
 	}
+
 	.webkit-html-tag-name, .webkit-html-tag, .webkit-html-attribute-name, .cm-xml-tag, .cm-xml-attribute { color: $yellow !important }
 	.webkit-html-attribute-value, .webkit-html-attribute a, .cm-xml-string { color: $string !important; }
 	.highlight, .webkit-html-text-node { color: $comment !important; }
 	.webkit-html-comment { color: $comment !important; }
+	.outline-disclosure { width: initial; }
 	.outline-disclosure li {
+		margin-top: 0px;
 		white-space: nowrap;
 		&.selected .selection {
 			z-index:0 !important;
@@ -315,8 +344,9 @@ body { /* the body scope is necessary to override built in important selector */
 		&.hovered:not(.selected) .selection { background: rgba(255, 255, 255, 0.1); }
 	}
 	.webkit-html-external-link, .webkit-html-resource-link {
-		color: #A3AD92;
-	}
+		color: $comment !important;
+		&:hover { color: $string !important }
+	} 
 
 	.split-view-resizer-border {
 		border-left: $darker-thin-lines !important;
@@ -331,8 +361,8 @@ body { /* the body scope is necessary to override built in important selector */
 			height: initial;
 		}
 
-		.scripts-debug-toolbar-drawer { border-bottom: $darker-thin-lines }
-		.scripts-debug-toolbar { background: $background }
+		.scripts-debug-toolbar, .scripts-debug-toolbar-drawer { background: $background }
+		.scripts-debug-toolbar-drawer { border-bottom: $darker-thin-lines; label { border-top: $darker-thin-lines } }
 
 		.sidebar-pane-filter-box {
 			border-top: $darker-thin-lines !important;
@@ -349,22 +379,23 @@ body { /* the body scope is necessary to override built in important selector */
 				&.element-state { -webkit-mask-image: url('chrome-extension://__MSG_@@extension_id__/images/paneElementStateButtons.png') }
 				-webkit-mask-size: 23px 17px;
 				background-image: none;
-				background: $glyph-arrow-color;
+				background: $darker-white;
 			}
 
 			.styles-section {
+				border-bottom: $darker-thin-lines !important;
+				color: $light-white !important;
 				.filter-match { background-color: $slightly-lighter }
-				.simple-selector.selector-matches {
-					color: $dark-white !important;
+				.simple-selector.selector-matches { color: $dark-white !important; }
+				.header .title .media {
+					&, & .subtitle {
+						color: $comment !important;
+					}
 				}
 			}
 
 			.styles-section.read-only:not(.computed-style) {
 				background: $background;	
-			}
-
-			.styles-section {
-				border-bottom: $darker-thin-lines !important;
 			}
 
 			.styles-section, .sidebar-pane-filter-box {
@@ -381,10 +412,33 @@ body { /* the body scope is necessary to override built in important selector */
 		}
 
 		.metrics-and-computed .metrics {
+			color: $light-white;
 			border-bottom: $darker-thin-lines !important;
 		}
 	}
 
+}
+
+.events-pane .section {
+	&:not(:nth-of-type(1)) { border-top: $darker-thin-lines }
+}
+
+.vbox.elements #elements-crumbs {
+	border-top: $darker-thin-lines;
+	background-color: $background;
+	@include main-content-footer;
+	& /deep/ .crumbs {
+		// line-height: $main-line-height;
+		// font-size: $main-size;
+		.crumb { 
+			height: initial;
+			&:hover { background-color: $background; }
+			&:hover, &.selected, &.selected:hover { font-weight: 300 }
+			&.selected, &.selected:hover { background-color: $slightly-lighter !important }
+			&:nth-child(n+2) { border-left: $darker-thin-lines }
+		}
+		.crumb, span.extra { text-shadow: none; }
+	}
 }
 
 .split-view-resizer-border { 
@@ -393,7 +447,18 @@ body { /* the body scope is necessary to override built in important selector */
 
 /* Console Start */
 
-.console-view {
+html .platform-mac .console-view {
+
+	color: $light-white !important;
+
+	.webkit-html-external-link, .webkit-html-resource-link {
+		color: $comment !important;
+		&:hover { color: $string !important }
+	} 
+
+	#console-messages .link, #console-messages a {
+		color: #A3AD92;
+	}
 
 	.console-object-preview { color: white }
 
@@ -454,30 +519,6 @@ body { /* the body scope is necessary to override built in important selector */
 		color: inherit;
 	}
 
-	.console-error-level .console-message-text, .console-error-level .section > .header .title {
-		line-height: $main-line-height;
-	    color: $red !important;
-	    font-weight: 500;
-	}
-
-	// .outline-disclosure li.parent, .section div.header.monospace {
-	// 	&::before {
-	// 		-webkit-user-select: none;
-	// 		-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
-	// 		-webkit-mask-position: -4px -96px;
-	// 		-webkit-mask-size: 320px 144px;
-	// 		content: "a";
-	// 		color: transparent;
-	// 		text-shadow: none;
-	// 		position: relative;
-	// 		top: 4px;
-	// 		margin-right: 1px;
-	// 		height: 12px;
-	// 		opacity: 1;
-	// 		background-color: rgb(94,94,94);
-	// 	}
-	// }
-
 	.outline-disclosure li.parent.expanded, .section.expanded div.header.monospace {
 		
 		&::before {
@@ -485,6 +526,12 @@ body { /* the body scope is necessary to override built in important selector */
 		}
 	}
 
+}
+
+.console-error-level .console-message-text, .console-error-level .section > .header .title, .section .properties .value.error {
+	line-height: $main-line-height;
+    color: $red !important;
+    font-weight: 400;
 }
 
 /* Console End */
