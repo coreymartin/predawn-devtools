@@ -2,22 +2,28 @@
     @return $em/1em * $base;
 }
 
+$light-white: rgb(229,229,229);
+$dark-white: rgb(145,145,145);
+$darker-white: rgb(94,94,94);
+
 $brown: #B88E74;
 $red: rgb(200, 93, 55);
-$string: rgb(135,155,116);
+$string: #9db075;
 $purple: rgb(154,132,158);
-$orange: rgba(255, 126, 86, 0.69);
+$orange: rgb(241,130,95);
 $blue: rgb(117, 135, 166);
-$background: #2F3737;
+$background: rgb(40,40,40);
 $slightly-lighter: rgba(130, 130, 130, 0.2);
-$yellow: #c9b18e;
+$yellow: rgb(224, 197, 137);
 $js-keyword: rgb(249, 238, 152);
-$comment: rgb(150,150,150);
-$selected: rgba(161, 174, 175, 0.2);
+$comment: $dark-white;
+$selected: rgba(161, 174, 175, 0.1);
+$orange-highlight: rgb(241, 130, 96);
 
 $main-size: 16px;
 $main-line-height: 1.25em;
 $main-font-weight: 200;
+$main-px: px($main-line-height, $main-size);
 $bigger-line-height: $main-line-height + 0.5em;
 $bigger-px: px($bigger-line-height, $main-size);
 @warn $bigger-px;
@@ -25,27 +31,29 @@ $sub-size: 15px;
 $sub-line-height: 1.25em;
 $thin-lines: 1px solid rgb(120,120,120);
 $darker-width: 1px;
-$darker-thin-lines: $darker-width solid #4C4C4C;
+$darker-thin-lines: $darker-width solid rgb(50,50,50);
 
-$light-white: rgb(229,229,229);
-$dark-white: rgb(145,145,145);
-$darker-white: rgb(94,94,94);
+$img_path: "chrome-extension://__MSG_@@extension_id__/images/";
+
+$big_tabs: 38px;
+$unselected_tabs: darken($background, 3%);
 
 @mixin main-content-footer($font-size:$sub-size) {
-	flex-basis: px($bigger-line-height, $font-size) + $darker-width !important;
+	flex-basis: $big_tabs !important;
 	&, & *, & /deep/ * {
 		font-size: $font-size !important;
 		font-weight: $main-font-weight;
-		line-height: $bigger-line-height;
+		line-height: $big_tabs;
 		color: $dark-white;
 	}
 }
 
 html {
-	.styles-pane, .vbox.sources, .vbox.elements, .platform-mac .console-view { /* only target the "Sources" and "Elements" panes */
+	.styles-pane, .vbox.sources, .vbox.elements, .platform-mac .console-view, #drawer-tabbed-pane { /* only target the "Sources" and "Elements" panes */
 		&, .tabbed-pane-content { background: $background }
-		& /deep/ .platform-mac, & {
+		&, & /deep/ .platform-mac, & #console-messages, input, textarea, keygen, select, button {
 			* { font-family: 'Source Code Pro' !important; }
+			-webkit-text-stroke: 1px rgba(0,0,0,0.1);
 			font-size: $main-size !important;
 			font-weight: $main-font-weight !important;
 			line-height: $main-line-height !important;
@@ -59,8 +67,29 @@ html {
 
 ::selection, ol.watch-expressions > li.hovered, .CodeMirror-selected { background: $selected !important; }
 
-.glyph { background-color: $darker-white; opacity: 1 !important; }
+.glyph { background-color: $darker-white; opacity: 1 !important; top: 1px; }
 .glyph.shadow { display: none; }
+.emulation-status-bar-item .glyph { -webkit-mask-position: -163px 2px }
+.node-search-status-bar-item .glyph { -webkit-mask-position: -224px -23px }
+.scripts-debug-toolbar {
+	.glyph {
+		height: 20px; // otherwise the other glyphs show below
+		bottom: 0px;
+		margin: auto;
+	}
+	.scripts-pause {
+		.glyph { -webkit-mask-position: -32px -75px }
+		&.toggled-on .glyph { -webkit-mask-position: 0 -75px }
+	}
+	.scripts-toggle-breakpoints {
+		.glyph { -webkit-mask-position: 0px -26px }
+		&.toggled-on .glyph { -webkit-mask-position: -32px -2px }
+	}
+	.scripts-step-over .glyph { -webkit-mask-position: -128px -75px }
+	.scripts-step-into .glyph { -webkit-mask-position: -64px -75px }
+	.scripts-step-out .glyph { -webkit-mask-position: -64px -75px }
+	.scripts-pause-on-exceptions-status-bar-item .glyph { -webkit-mask-position: -256px -2px }
+}
 button.status-bar-item, div.status-bar-item {
 	padding:0;
 	height: $bigger-px;
@@ -68,19 +97,25 @@ button.status-bar-item, div.status-bar-item {
 		vertical-align: 1px;
 		margin-right: 5px;
 	}
-	&.toggled-on .glyph:not(.shadow) { background-color: $light-white !important }
+	&.toggled-on .glyph:not(.shadow) { background-color: $orange !important }
 }
-
+.status-bar-item {
+	vertical-align: top;
+	.status-bar-counter-item  {
+		vertical-align: top;
+	}
+}
 
 .swatch { 
 	line-height: 0px;
 	border-radius: 50%;
 	overflow: hidden;
-	width: 12px;
-	height: 12px;
-	box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.2);
+	width: 13px;
+	height: 13px;
 	.swatch-inner, .swatch-inner:hover {
 		border:none;
+		border-radius: 50%;
+		box-shadow: 0px 0px 0px 1px rgba(255,255,255,0.5) inset;
 	}
 }
 
@@ -90,48 +125,57 @@ button.status-bar-item, div.status-bar-item {
 .panel.sources .navigator-tabbed-pane {
 
 	.tabbed-pane-header { 
-		background-color: $background !important;
-		border-bottom: $darker-thin-lines;
+		background-color: $unselected_tabs !important;
+		border-bottom: none;
 		@include main-content-footer;
 		.tabbed-pane-header-contents { margin: 0 }
 		.tabbed-pane-header-tab {
 			border: none;
-			padding: 0;
+			padding: 0 15px;
 			margin: 0;
-			height: 27px;
+			height: $big_tabs;
 			width: initial !important;
-			padding: 0 6px;
 			font-weight: $main-font-weight;
-			&.selected { background: $slightly-lighter; }
+			&.selected { 
+				background: $background;
+				.tabbed-pane-header-tab-title { color: $light-white }
+			}
 		}
 	}
 
 }
 
+#drawer-contents {
+	.tabbed-pane-header { 
+		background-color: $background !important;
+		.tabbed-pane-header-tab.selected { background-color: lighten($background, 2%) }
+	}
+}
+
 .toolbar {
 	* { font-family: 'Source Code Pro' !important; }
 	padding: 0;
-	background: $background;
-	border-bottom: $darker-thin-lines;
+	background: $unselected_tabs;
+	border-bottom: none;
 	@include main-content-footer($font-size:$main-size);
 	.tabbed-pane-header {
 		border: none !important;
 		@include main-content-footer($font-size:$main-size);
 	}
 	.tabbed-pane-header-tabs {
-		.tabbed-pane-header-tab { height: $bigger-px }
-		.tabbed-pane-header-tab:nth-child(n-1) { border-left: $darker-thin-lines }
-		.tabbed-pane-header-tab:last-child { border-right: $darker-thin-lines }
+		.tabbed-pane-header-tab { height: $big_tabs }
 	}
 	.toolbar-controls-left, .toolbar-controls-right {
 		opacity: 1;
 		margin: 0;
-		background: $background;
+		background: $unselected_tabs;
 	}
 }
 
-li.overloaded { 
-	color: $comment;
+li.overloaded, .styles-section .properties .has-ignorable-error { 
+	color: $light-white;
+	// background-color: $light-white;
+	opacity: 0.5;
 	.value { color: $light-white; }
 }
 
@@ -175,23 +219,27 @@ li.overloaded {
 		&.enabled-button { left: -38px; }
 	}
 	.properties-tree li {
-		line-height: $main-line-height !important;
-		padding-top: 0px;
+		&, &.event-listener-breakpoints {
+			line-height: $main-line-height !important;
+			padding-top: 0px;
+		}
 	}
 	.navigator {
-		color: $comment;
+		color: lighten($dark-white, 20%);
 		.icon {
 			width: 20px;
 			height: 20px;
 			float: left;
-			padding: 2px;
+			padding: 4px;
 		}
+		.navigator-domain-tree-item .icon { content: url($img_path + 'domain.png') }
+		.navigator-folder-tree-item .icon { content: url($img_path + 'folder.png'); opacity: 1 }
 		li {
 			line-height: $main-line-height;
 			&, &.selected .selection { height: $main-line-height }
 		}
 	}
-	li.parent, .sidebar-pane-title, .events-pane .section .header.monospace {
+	li.parent, .sidebar-pane-title, .section .header.monospace {
 		@mixin arrow {
 			-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
 			-webkit-mask-size: 320px 144px;
@@ -213,27 +261,68 @@ li.overloaded {
 
 	}
 	.expanded { -webkit-mask-position: -20px -90px }
+	.search-bar {
+		$extra-space: 15px;
+		$per-side: $extra-space/2;
+		$search-height: $bigger-px + $extra-space;
+		background: $unselected_tabs;
+		height: $search-height;
+		flex: 0 0 $search-height;
+		line-height: $search-height;
+		border-top: $darker-thin-lines;
+		&.replaceable { 
+			height: $search-height * 2; 
+			flex: 0 0 $search-height * 2; 
+			tr:nth-child(2) { margin-top: -1 * $per-side; }
+		}
+		td { line-height: $bigger-px; height: $search-height }
+		.toolbar-search-control, .toolbar-replace-control {
+			td:nth-child(1) & { margin-left: $per-side; }
+		}
+		.toolbar-search-navigation-controls {
+			background: $background;
+		}
+		.toolbar-search td > span { line-height: $main-line-height; align-items: initial; }
+		.toolbar-search button.search-action-button {
+			border: none;
+			border-radius: 0;
+			margin: 0;
+			background: $background;
+			width: 100%;
+			height: $bigger-px;
+			width: initial;
+		}
+		.status-bar-item { width: initial; height: initial }
+		.status-bar-item .status-bar-button-text {
+			line-height: $bigger-px;
+		}
+		.search-results-matches { font-size: $main-size; }
+		.toolbar-search-navigation {
+			&.toolbar-search-navigation-next, &.toolbar-search-navigation-prev {
+				background: white;
+				-webkit-mask-repeat: no-repeat;
+				-webkit-mask-position: 4px 11px;
+			}
+			&.toolbar-search-navigation-next {
+				-webkit-mask-image: url($img_path + 'down-arrow.png');
+			}
+			&.toolbar-search-navigation-prev {
+				-webkit-mask-image: url($img_path + 'up-arrow.png');
+			}
+		}
+		.toolbar-search-control, .toolbar-replace-control, .search-replace {
+			border: 0;
+			line-height: $bigger-px;
+			background: $background;
+			height: $bigger-px; 
+		}
+		.search-replace { padding: 0 $per-side; }
+	}
 }
 
 .error-icon-small {
 	background-image: none;
 	position: relative;
-}
-
-.error-icon-small:after, .console-error-level:before {
-	font-family: 'Source Code Pro';
-	content: "x";
-	position: absolute;
-	width: 10px;
-	height: 10px;
-	font-size: 16px;
-	font-weight: 100;
-	line-height: 6px;
-	border-radius: 50%;
-	color: $light-white;
-	background-color: $red;
-	border: 1px $red solid;
-	background-image: none;
 }
 
 .sources-status-bar {
@@ -243,11 +332,17 @@ li.overloaded {
 
 }
 
-.vbox.sources, .vbox.elements /deep/ { /* only target the "Sources" and "Elements" panes */
+.vbox.sources, .vbox.elements /deep/, .console-view { /* only target the "Sources" and "Elements" panes */
+
+	.section .properties .dimmed {
+		opacity: 0.3;
+	}
 
 	.section .properties .name, .event-properties .name, .console-object-preview .name  {
 		color: white !important;
 	}
+
+	.highlighted-search-result { background-color: $orange-highlight; color: black !important; }
 
 	.webkit-html-pseudo-element {
 		color: $red;
@@ -279,6 +374,9 @@ li.overloaded {
 		.CodeMirror-linenumber { font-size: 14px; padding: 0 !important; text-align:center !important; opacity: 0.5; }
 		.CodeMirror-gutters { background-color: $background; border-right: $darker-thin-lines !important; padding-right:0px; }
 
+		.text-editor-line-with-warning, .text-editor-line-with-error {
+			&:not(.cm-execution-line) { background-color:$selected }
+		}
 		@-webkit-keyframes highlight-bg {
 			0% { background-color: $background; }
 			25% { background-color: $selected; }
@@ -288,32 +386,41 @@ li.overloaded {
 			-webkit-animation: "highlight-bg" 1.5s 0s !important;
 		}
 
+		.cm-line-with-selection .cm-column-with-selection.cm-search-highlight {
+			color: black !important;
+			&:before { background-color: $orange-highlight; }
+		}
+
 		.cm-s-web-inspector-html .CodeMirror-code pre { max-width: 100%; }
 
 		@-webkit-keyframes corey {
-			0% { background-color: rgb(255, 224, 0); color: black; }
+			0% { background-color: $orange-highlight; color: black; }
 			100% { background-color: transparent; color: white; } 
 		}
 		.CodeMirror-matchingbracket { 
-			-webkit-animation: "corey" 0.5s 0.3s !important; 
-			border-radius: 3px !important; 
-			padding: 2px 0px; 
-			color: white !important; 
+			-webkit-animation: none;
+			color: white !important;
 			border: none !important;
+			border-bottom: 1px dotted $orange !important;
 		}
 		.CodeMirror-nonmatchingbracket { color: white !important; }
 	}
 
-	.CodeMirror-code pre, .webkit-css-keyword, .cm-css-operator, .cm-js-operator, .webkit-css-operator { color: $light-white !important; }
-	.cm-css-def, .cm-js-def, .webkit-css-def, .webkit-css-selector, .cm-css-builtin, .cm-css-qualifier, .cm-css-keyword { color: $yellow !important; }
-	.cm-css-property, .cm-js-property, .webkit-css-property, .cm-css-meta { color: $purple !important; }
-	.cm-css-string-2, .cm-js-string-2, .webkit-css-string-2, .cm-keyword { color: $yellow !important; }
-	.cm-css-comment, .cm-js-comment, .webkit-css-comment { color: $comment !important; }
-	.cm-css-number, .cm-js-number, .webkit-css-number, .cm-css-atom, .cm-js-atom, .webkit-css-atom  { color: $yellow !important;}
-	.cm-css-string, .cm-js-string, .webkit-css-string, .cm-string { color: $string !important }
-	.cm-css-attribute, .cm-js-attribute, .webkit-css-attribute { color: $brown !important; }
-	.cm-css-tag, .cm-js-tag, .webkit-css-tag { color: $brown !important; }
-	.cm-css-variable, .cm-js-variable, .webkit-css-variable, .cm-variable { color: $blue !important; }
+	@mixin incSelected($color) {
+		color: $color !important;
+		&.CodeMirror-selectedtext:not(.CodeMirror-persist-highlight) { color: $color !important }
+	}
+	.CodeMirror-selectedtext:not(.CodeMirror-persist-highlight) { color: inherit !important; }
+	.CodeMirror-code pre, .webkit-css-keyword, .cm-css-operator, .cm-js-operator, .webkit-css-operator { @include incSelected($light-white) }
+	.cm-css-def, .cm-js-def, .webkit-css-def, .webkit-css-selector, .cm-css-builtin, .cm-css-qualifier, .cm-css-keyword { @include incSelected($yellow) }
+	.cm-css-property, .cm-js-property, .webkit-css-property, .cm-css-meta { @include incSelected($purple); }
+	.cm-css-string-2, .cm-js-string-2, .webkit-css-string-2, .cm-keyword { @include incSelected($yellow); }
+	.cm-css-comment, .cm-js-comment, .webkit-css-comment { @include incSelected($comment); }
+	.cm-css-number, .cm-js-number, .webkit-css-number, .cm-css-atom, .cm-js-atom, .webkit-css-atom { @include incSelected($yellow);}
+	.cm-css-string, .cm-js-string, .webkit-css-string, .cm-string { @include incSelected($string) }
+	.cm-css-attribute, .cm-js-attribute, .webkit-css-attribute { @include incSelected($brown); }
+	.cm-css-tag, .cm-js-tag, .webkit-css-tag { @include incSelected($brown); }
+	.cm-css-variable, .cm-js-variable, .webkit-css-variable, .cm-variable { @include incSelected($blue); }
 
 	.cm-comment, .cm-xml-comment { color: $comment !important; }
 	.cm-variable, .cm-meta { color: $light-white !important; }
@@ -361,6 +468,32 @@ li.overloaded {
 			height: initial;
 		}
 
+		.sidebar-pane .placard {
+			padding: 0px 8px 0px 18px;
+			.title { font-weight: 200 }
+			.subtitle { color: $dark-white }
+			&.selected { background-color: $selected }
+			&:nth-of-type(2n):not(.selected) { background-color: $background }
+		}
+
+		.sidebar-pane > .body .placard + .info {
+			background-color: $selected;
+			border-top: none;
+		}
+
+		.sidebar-pane > .body .info {
+			padding: 0px 6px;
+			color: $dark-white;
+		}
+
+		.breakpoint-list li:hover {
+			background-color: $selected;
+		}
+
+		.sidebar-pane .breakpoint-hit {
+			background-color: $selected;
+		}
+
 		.scripts-debug-toolbar, .scripts-debug-toolbar-drawer { background: $background }
 		.scripts-debug-toolbar-drawer { border-bottom: $darker-thin-lines; label { border-top: $darker-thin-lines } }
 
@@ -375,8 +508,8 @@ li.overloaded {
 		.style-panes-wrapper {
 
 			.sidebar-pane-toolbar > .pane-title-button, .sidebar-pane-button-new-rule {
-				-webkit-mask-image: url('chrome-extension://__MSG_@@extension_id__/images/paneAddButtons.png');
-				&.element-state { -webkit-mask-image: url('chrome-extension://__MSG_@@extension_id__/images/paneElementStateButtons.png') }
+				-webkit-mask-image: url($img_path + 'paneAddButtons.png');
+				&.element-state { -webkit-mask-image: url($img_path + 'paneElementStateButtons.png') }
 				-webkit-mask-size: 23px 17px;
 				background-image: none;
 				background: $darker-white;
@@ -409,6 +542,13 @@ li.overloaded {
 				color: $light-white !important;
 			}
 
+			.styles-element-state-pane {
+				$state-height: 80px;
+				height: $state-height;
+				// margin-top: -1 * $state-height;
+				border-bottom: $darker-thin-lines;
+			}
+
 		}
 
 		.metrics-and-computed .metrics {
@@ -421,6 +561,11 @@ li.overloaded {
 
 .events-pane .section {
 	&:not(:nth-of-type(1)) { border-top: $darker-thin-lines }
+	& > header { font-weight: $main-font-weight }
+	.event-bars .event-bar .header .title {
+		font-weight: $main-font-weight;
+		text-shadow: none;
+	}
 }
 
 .vbox.elements #elements-crumbs {
@@ -434,7 +579,9 @@ li.overloaded {
 			height: initial;
 			&:hover { background-color: $background; }
 			&:hover, &.selected, &.selected:hover { font-weight: 300 }
-			&.selected, &.selected:hover { background-color: $slightly-lighter !important }
+			&.selected, &.selected:hover {
+				background-color: lighten($background, 2%);
+			}
 			&:nth-child(n+2) { border-left: $darker-thin-lines }
 		}
 		.crumb, span.extra { text-shadow: none; }
@@ -444,6 +591,22 @@ li.overloaded {
 .split-view-resizer-border { 
 	border-top: $darker-thin-lines !important;
 }
+
+// .close-button-gray:hover {
+// }
+// .close-button-gray {
+// 	background: none;
+// }
+// .close-button, .close-button-gray {
+// 	&:before {
+// 		content: "×";
+// 		color: $orange;
+// 		font-size: 12px;
+// 	}
+// 	background: none;
+// 	background-size: 320px 144px;
+// 	display: inline-block;
+// }
 
 /* Console Start */
 
@@ -460,13 +623,17 @@ html .platform-mac .console-view {
 		color: #A3AD92;
 	}
 
-	.console-object-preview { color: white }
+	.console-object-preview { color: $light-white; font-weight: 100 }
 
 	.section .properties .name, .event-properties .name, .console-object-preview .name {
 		color: $purple;
 	}
 
-	.console-formatted-string, .console-formatted-regexp, .console-formatted-symbol {
+	.console-formatted-string {
+		color: $string;
+	}
+
+	.console-formatted-number, .console-formatted-regexp, .console-formatted-symbol, .console-formatted-boolean {
 		color: $red;
 	}
 
@@ -478,7 +645,14 @@ html .platform-mac .console-view {
 		$main-line-height: 23px;
 		border-top: $darker-thin-lines;
 		#console-prompt {
-			&::before { background-position: -192px -107px; }
+			&::before {
+				background: none;
+				-webkit-mask-position: -192px -107px;
+				-webkit-user-select: none;
+				-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
+				-webkit-mask-size: 320px 144px;
+				background-color: $orange;
+			}
 			min-height: $main-line-height;
 			line-height: $main-line-height;
 		}
@@ -526,6 +700,42 @@ html .platform-mac .console-view {
 		}
 	}
 
+}
+
+.bubble-repeat-count, .console-warning-level::before, .error-icon-small:after, .console-error-level:before {
+	line-height: $main-px;
+	width: $main-px;
+	height: $main-px;
+	color: $orange;
+	margin-top: 0px;
+	top: 0px;
+	font-size: 18px;
+}
+
+.bubble-repeat-count {
+	background: none;
+	font-weight: $main-font-weight;
+	padding-left: 3px;
+	font-size: 14px;
+}
+
+.console-warning-level, .warning-icon-small {
+	background-image: none;
+	&:before {
+		background-image: none;
+		content: "*";
+		color: $orange;
+		text-indent: 7px;
+		font-weight: 600;
+	}
+}
+
+.error-icon-small:after, .console-error-level:before {
+	font-family: 'Source Code Pro';
+	content: "x";
+	position: absolute;
+	font-weight: 100;
+	background-image: none;
 }
 
 .console-error-level .console-message-text, .console-error-level .section > .header .title, .section .properties .value.error {
