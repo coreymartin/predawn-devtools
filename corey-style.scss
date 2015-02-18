@@ -13,7 +13,7 @@ $purple: rgb(154,132,158);
 $orange: rgb(241,130,95);
 $blue: rgb(117, 135, 166);
 $background: rgb(40,40,40);
-$slightly-lighter: rgba(130, 130, 130, 0.2);
+$slightly-lighter: lighten($background, 2%);
 $yellow: rgb(224, 197, 137);
 $js-keyword: rgb(249, 238, 152);
 $comment: $dark-white;
@@ -26,27 +26,51 @@ $main-font-weight: 200;
 $main-px: px($main-line-height, $main-size);
 $bigger-line-height: $main-line-height + 0.5em;
 $bigger-px: px($bigger-line-height, $main-size);
-@warn $bigger-px;
 $sub-size: 15px;
 $sub-line-height: 1.25em;
 $thin-lines: 1px solid rgb(120,120,120);
 $darker-width: 1px;
-$darker-thin-lines: $darker-width solid rgb(50,50,50);
+$darker-thin-lines: $darker-width dotted rgb(50,50,50);
 
-$img_path: "chrome-extension://__MSG_@@extension_id__/images/";
+$err_dim: $main-px;
+$err_icon_dim: $err_dim - 2px;
+
+$glyph-color: $dark-white;
+$glyph-selected-color: $orange;
+
+@function img_url($file) {
+	@return url("chrome-extension://__MSG_@@extension_id__/images/" + $file);
+}
 
 $big_tabs: 38px;
-$unselected_tabs: darken($background, 3%);
+$unselected_tabs: darken($background, 10%);
 
 @mixin main-content-footer($font-size:$sub-size) {
 	flex-basis: $big_tabs !important;
 	&, & *, & /deep/ * {
 		font-size: $font-size !important;
-		font-weight: $main-font-weight;
-		line-height: $big_tabs;
-		color: $dark-white;
+		font-weight: $main-font-weight !important;
+		line-height: $big_tabs !important;
+		color: $dark-white !important;
 	}
 }
+
+@mixin arrow {
+	-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
+	-webkit-mask-size: 320px 144px;
+	-webkit-mask-position: -4px -91px;
+	background-color: $glyph-color;
+	background-position: initial !important;
+	opacity:1 !important;
+	width: 8px !important;
+	height: 20px !important;
+	vertical-align: bottom;
+	margin-right: 4px !important;
+	top: 0px;
+}
+@mixin toggled-arrow { -webkit-mask-position: -20px -90px }
+
+input, textarea { cursor: img_url("cursor.png") }
 
 html {
 	.styles-pane, .vbox.sources, .vbox.elements, .platform-mac .console-view, #drawer-tabbed-pane { /* only target the "Sources" and "Elements" panes */
@@ -67,7 +91,18 @@ html {
 
 ::selection, ol.watch-expressions > li.hovered, .CodeMirror-selected { background: $selected !important; }
 
-.glyph { background-color: $darker-white; opacity: 1 !important; top: 1px; }
+.child-editing { 
+	color: $light-white !important;
+}
+.editing, .editing * {
+	outline: none !important;
+	color: $light-white !important;
+	&::selection { background-color: $background !important; }
+	background-color: $selected !important;
+	box-shadow: none;
+}
+
+.glyph { background-color: $glyph-color; opacity: 1 !important; top: 1px; }
 .glyph.shadow { display: none; }
 .emulation-status-bar-item .glyph { -webkit-mask-position: -163px 2px }
 .node-search-status-bar-item .glyph { -webkit-mask-position: -224px -23px }
@@ -87,8 +122,13 @@ html {
 	}
 	.scripts-step-over .glyph { -webkit-mask-position: -128px -75px }
 	.scripts-step-into .glyph { -webkit-mask-position: -64px -75px }
-	.scripts-step-out .glyph { -webkit-mask-position: -64px -75px }
+	.scripts-step-out .glyph { -webkit-mask-position: -97px -75px }
 	.scripts-pause-on-exceptions-status-bar-item .glyph { -webkit-mask-position: -256px -2px }
+	.long-click-glyph.shadow {
+		top: 3px;
+		background-color: $glyph-color !important;
+		z-index: 1;
+	}
 }
 button.status-bar-item, div.status-bar-item {
 	padding:0;
@@ -97,7 +137,7 @@ button.status-bar-item, div.status-bar-item {
 		vertical-align: 1px;
 		margin-right: 5px;
 	}
-	&.toggled-on .glyph:not(.shadow) { background-color: $orange !important }
+	&.toggled-on .glyph:not(.shadow), &.toggled-shown .glyph { background-color: $glyph-selected-color !important }
 }
 .status-bar-item {
 	vertical-align: top;
@@ -207,7 +247,7 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			line-height: 7px;
 			border-radius: 50%;
 			color: $light-white;
-			border: 1px $light-white dotted;
+			border: 1px $dark-white solid;
 		}
 		&:hover:after {  }
 		&:checked:after { 
@@ -232,28 +272,15 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			float: left;
 			padding: 4px;
 		}
-		.navigator-domain-tree-item .icon { content: url($img_path + 'domain.png') }
-		.navigator-folder-tree-item .icon { content: url($img_path + 'folder.png'); opacity: 1 }
+		@warn img_url("domain.png");
+		.navigator-domain-tree-item .icon { content: img_url("domain.png") }
+		.navigator-folder-tree-item .icon { content: img_url("folder.png"); opacity: 1 }
 		li {
 			line-height: $main-line-height;
 			&, &.selected .selection { height: $main-line-height }
 		}
 	}
 	li.parent, .sidebar-pane-title, .section .header.monospace {
-		@mixin arrow {
-			-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
-			-webkit-mask-size: 320px 144px;
-			-webkit-mask-position: -4px -91px;
-			background-color: $darker-white;
-			background-position: initial !important;
-			opacity:1 !important;
-			width: 8px !important;
-			height: 20px !important;
-			vertical-align: bottom;
-			margin-right: 4px !important;
-			top: 0px;
-		}
-		@mixin toggled-arrow { -webkit-mask-position: -20px -90px }
 		.expand-element { @include arrow; }
 		&.expanded .expand-element { @include toggled-arrow; }
 		&::before { @include arrow; }
@@ -304,10 +331,10 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 				-webkit-mask-position: 4px 11px;
 			}
 			&.toolbar-search-navigation-next {
-				-webkit-mask-image: url($img_path + 'down-arrow.png');
+				-webkit-mask-image: img_url("down-arrow.png");
 			}
 			&.toolbar-search-navigation-prev {
-				-webkit-mask-image: url($img_path + 'up-arrow.png');
+				-webkit-mask-image: img_url("up-arrow.png");
 			}
 		}
 		.toolbar-search-control, .toolbar-replace-control, .search-replace {
@@ -317,6 +344,11 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			height: $bigger-px; 
 		}
 		.search-replace { padding: 0 $per-side; }
+	}
+	.console-filters-header {
+		&, & * {
+			line-height: $bigger-px;
+		}
 	}
 }
 
@@ -332,14 +364,73 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 
 }
 
-.vbox.sources, .vbox.elements /deep/, .console-view { /* only target the "Sources" and "Elements" panes */
+html /deep/ .popover.platform-mac, html #glass-pane {
+	&, /deep/ .platform-mac *, * {
+		color: lighten($dark-white, 15%);
+		font-family: "Source Code Pro" !important;
+		font-size: $main-size;
+		font-weight: normal;
+	}
+	background: $slightly-lighter;
+	-webkit-border-image: none;
+}
+
+html /deep/ {
+	.filtered-item-list-dialog {
+		& > div.container {
+			background-color: $background;
+			.filtered-item-list-dialog-item.selected { background: $selected }
+			.filtered-item-list-dialog-item.two-rows { border-bottom: $darker-thin-lines }
+			span.highlight { color: $orange !important; }
+			.filtered-item-list-dialog-subtitle {
+				$f-size: $main-size - 5px;
+				color: $dark-white !important;
+				font-size: $f-size !important;
+				font-weight: 100;
+				span.highlight { font-size: $f-size !important; }
+			}
+		}
+		input[type="text"] { 
+			background: $background;
+			box-shadow: none;
+			font-size: $main-size !important;
+			font-weight: normal;
+		}
+	}
+}
+
+.toolbar, body.undocked.platform-mac.inactive .toolbar-colors, body.undocked.platform-mac .toolbar-colors { 
+	background: $background !important;
+	background-image: none !important;
+}
+
+.dialog {
+	border: 5px solid $selected !important;
+	box-shadow: none;
+}
+
+.vbox.sources {
+	$padding: 10px;
+	.sidebar-pane { padding-left: $padding }
+	.sidebar-pane-title {
+		padding-left: $padding;
+		&:before { top: 7px; }
+	}
+}
+
+.vbox.sources, .vbox.elements /deep/, .console-view /deep/ { /* only target the "Sources" and "Elements" panes */
+
+	.elements-tree-outline li.shadow-root + ol {
+		border-left: 1px dotted rgba($orange, 0.3);
+	}
 
 	.section .properties .dimmed {
-		opacity: 0.3;
+		opacity: 1;
 	}
 
 	.section .properties .name, .event-properties .name, .console-object-preview .name  {
-		color: white !important;
+		color: $light-white !important;
+		font-weight: 100 !important;
 	}
 
 	.highlighted-search-result { background-color: $orange-highlight; color: black !important; }
@@ -351,9 +442,41 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 	span.cm-property { color: white; }
 
 	.cm-execution-line {
-		background-color: rgba(0, 107, 167, 0.86);
-		outline: 1px solid rgba(37, 99, 255, 0.54);
-		background-blend-mode: overlay;
+		background-color: $selected;
+		outline: none;
+		.CodeMirror-linenumber { border: none !important; }
+		&.cm-breakpoint {
+			.CodeMirror-linenumber.CodeMirror-gutter-elt {
+				border-right: none !important;
+				&:after {
+					background: $string;
+				}
+			}
+		}
+	}
+
+	.cm-breakpoint {
+		.CodeMirror-linenumber.CodeMirror-gutter-elt {
+			border: none !important;
+			height: $main-px !important;
+			line-height: $main-px !important;
+			color: rgba(0,0,0,0);
+			margin: 0 !important;
+			$dim: $main-px - 4px;
+			&:after {
+				height: $dim;
+				width: $dim;
+				position: absolute;
+				content: "";
+				background: $orange;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				margin: auto;
+				border-radius: 50%;
+			}
+		}
 	}
 
 	$line-number-size: 50px;
@@ -367,16 +490,30 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			font-family: 'Source Code Pro' !important; 
 			line-height: $main-line-height !important
 		}
-		.CodeMirror-cursor { border-left: 1px solid white !important; }
-		.CodeMirror-lines { background: $background; }
+		.CodeMirror-cursor { border-left: 1px solid $orange !important; }
 		.CodeMirror-sizer { margin-left: $line-number-size + 1px !important; }
 		.CodeMirror-linenumbers { width: $line-number-size !important; }
-		.CodeMirror-linenumber { font-size: 14px; padding: 0 !important; text-align:center !important; opacity: 0.5; }
+		.CodeMirror-linenumber { 
+			font-size: 14px; 
+			padding: 0 !important; 
+			text-align: center !important; 
+			opacity: 1; 
+			color: darken($dark-white, 20%);
+			font-weight: normal;
+		}
 		.CodeMirror-gutters { background-color: $background; border-right: $darker-thin-lines !important; padding-right:0px; }
 
 		.text-editor-line-with-warning, .text-editor-line-with-error {
 			&:not(.cm-execution-line) { background-color:$selected }
+			.text-editor-line-decoration-wave {
+				background: none;
+				.text-editor-line-decoration-icon {
+					right: -1*$err_icon_dim;
+					top: -1*$err_icon_dim;
+				}
+			}
 		}
+
 		@-webkit-keyframes highlight-bg {
 			0% { background-color: $background; }
 			25% { background-color: $selected; }
@@ -416,14 +553,15 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 	.cm-css-property, .cm-js-property, .webkit-css-property, .cm-css-meta { @include incSelected($purple); }
 	.cm-css-string-2, .cm-js-string-2, .webkit-css-string-2, .cm-keyword { @include incSelected($yellow); }
 	.cm-css-comment, .cm-js-comment, .webkit-css-comment { @include incSelected($comment); }
-	.cm-css-number, .cm-js-number, .webkit-css-number, .cm-css-atom, .cm-js-atom, .webkit-css-atom { @include incSelected($yellow);}
+	.cm-css-number, .cm-js-number, .webkit-css-number, .cm-css-atom, .cm-js-atom, .webkit-css-atom { @include incSelected($red);}
 	.cm-css-string, .cm-js-string, .webkit-css-string, .cm-string { @include incSelected($string) }
 	.cm-css-attribute, .cm-js-attribute, .webkit-css-attribute { @include incSelected($brown); }
-	.cm-css-tag, .cm-js-tag, .webkit-css-tag { @include incSelected($brown); }
-	.cm-css-variable, .cm-js-variable, .webkit-css-variable, .cm-variable { @include incSelected($blue); }
+	.cm-js-tag, .webkit-css-tag { @include incSelected($brown); }
+	.cm-css-tag { @include incSelected($blue) }
+	.cm-css-variable, .cm-js-variable, .webkit-css-variable, .cm-variable, .cm-css-variable-2, .cm-variable-2 { @include incSelected($blue); }
 
 	.cm-comment, .cm-xml-comment { color: $comment !important; }
-	.cm-variable, .cm-meta { color: $light-white !important; }
+	.cm-meta { color: $light-white !important; }
 	.cm-operator, .cm-js-keyword { color: $yellow !important; }
 	.cm-number { color: $red !important; }
 	.cm-builtin { color: $yellow !important; }
@@ -434,26 +572,6 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 		overflow-x: scroll;
 		padding: 0;
 	}
-
-	.webkit-html-tag-name, .webkit-html-tag, .webkit-html-attribute-name, .cm-xml-tag, .cm-xml-attribute { color: $yellow !important }
-	.webkit-html-attribute-value, .webkit-html-attribute a, .cm-xml-string { color: $string !important; }
-	.highlight, .webkit-html-text-node { color: $comment !important; }
-	.webkit-html-comment { color: $comment !important; }
-	.outline-disclosure { width: initial; }
-	.outline-disclosure li {
-		margin-top: 0px;
-		white-space: nowrap;
-		&.selected .selection {
-			z-index:0 !important;
-			pointer-events: none;
-			background-color: $selected !important;
-		}
-		&.hovered:not(.selected) .selection { background: rgba(255, 255, 255, 0.1); }
-	}
-	.webkit-html-external-link, .webkit-html-resource-link {
-		color: $comment !important;
-		&:hover { color: $string !important }
-	} 
 
 	.split-view-resizer-border {
 		border-left: $darker-thin-lines !important;
@@ -505,21 +623,25 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			}
 		}
 
-		.style-panes-wrapper {
+		.sidebar-pane-toolbar > .pane-title-button, .sidebar-pane-button-new-rule {
+			-webkit-mask-image: img_url("paneAddButtons.png");
+			&.element-state { -webkit-mask-image: img_url("paneElementStateButtons.png") }
+			&.refresh { -webkit-mask-image: img_url("paneRefreshButtons.png") }
+			-webkit-mask-size: 23px 17px;
+			background-image: none;
+			background: $glyph-color;
+		}
 
-			.sidebar-pane-toolbar > .pane-title-button, .sidebar-pane-button-new-rule {
-				-webkit-mask-image: url($img_path + 'paneAddButtons.png');
-				&.element-state { -webkit-mask-image: url($img_path + 'paneElementStateButtons.png') }
-				-webkit-mask-size: 23px 17px;
-				background-image: none;
-				background: $darker-white;
-			}
+		.style-panes-wrapper {
 
 			.styles-section {
 				border-bottom: $darker-thin-lines !important;
 				color: $light-white !important;
 				.filter-match { background-color: $slightly-lighter }
-				.simple-selector.selector-matches { color: $dark-white !important; }
+				.simple-selector { 
+					color: $dark-white !important;
+					&.selector-matches { color: $yellow !important }
+				}
 				.header .title .media {
 					&, & .subtitle {
 						color: $comment !important;
@@ -551,12 +673,42 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 
 		}
 
-		.metrics-and-computed .metrics {
-			color: $light-white;
-			border-bottom: $darker-thin-lines !important;
+		.metrics-and-computed .metrics { border-bottom: $darker-thin-lines !important; }
+
+		.metrics {
+			color: $background !important;
+			font-weight: normal !important;
 		}
 	}
 
+}
+
+body, body /deep/ {
+	.webkit-html-tag-name, .webkit-html-tag, .webkit-html-attribute-name, .cm-xml-tag, .cm-xml-attribute { color: $yellow !important }
+	.webkit-html-attribute-value, .webkit-html-attribute a, .cm-xml-string { color: $string !important; }
+	.highlight, .webkit-html-text-node { color: $comment !important; }
+	.webkit-html-comment { color: $comment !important; }
+	.outline-disclosure { width: initial; }
+	.outline-disclosure > ol { padding: 0px }
+	.outline-disclosure li {
+		margin-top: 0px;
+		white-space: nowrap;
+		&.selected .selection {
+			z-index:0 !important;
+			pointer-events: none;
+			background-color: $selected !important;
+		}
+		&.hovered:not(.selected) .selection {
+			border-radius: 0px;
+			background: rgba(255, 255, 255, 0);
+			left:0;
+			right:0;
+		}
+	}
+	.webkit-html-external-link, .webkit-html-resource-link {
+		color: $comment !important;
+		&:hover { color: $string !important }
+	}
 }
 
 .events-pane .section {
@@ -580,7 +732,7 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			&:hover { background-color: $background; }
 			&:hover, &.selected, &.selected:hover { font-weight: 300 }
 			&.selected, &.selected:hover {
-				background-color: lighten($background, 2%);
+				background-color: $slightly-lighter;
 			}
 			&:nth-child(n+2) { border-left: $darker-thin-lines }
 		}
@@ -610,7 +762,18 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 
 /* Console Start */
 
-html .platform-mac .console-view {
+.status-bar-item.console-context {
+	margin-left: 0;
+	margin-right: -16px;
+	background: $unselected_tabs 
+}
+
+.status-bar-item.checkbox {
+	margin-top: 0px;
+	margin-left: 3px;
+}
+
+html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 
 	color: $light-white !important;
 
@@ -627,6 +790,12 @@ html .platform-mac .console-view {
 
 	.section .properties .name, .event-properties .name, .console-object-preview .name {
 		color: $purple;
+	}
+
+	.console-formatted-array {
+		.console-formatted-node:hover {
+			background-color: rgba(0,0,0,0);
+		}
 	}
 
 	.console-formatted-string {
@@ -651,7 +820,7 @@ html .platform-mac .console-view {
 				-webkit-user-select: none;
 				-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
 				-webkit-mask-size: 320px 144px;
-				background-color: $orange;
+				background-color: $glyph-selected-color;
 			}
 			min-height: $main-line-height;
 			line-height: $main-line-height;
@@ -693,23 +862,27 @@ html .platform-mac .console-view {
 		color: inherit;
 	}
 
-	.outline-disclosure li.parent.expanded, .section.expanded div.header.monospace {
-		
-		&::before {
-			-webkit-mask-position: -20px -96px;
+	&, & /deep/ {
+		.outline-disclosure li.parent::before {
+			@include arrow;
+		}
+		.outline-disclosure li.parent.expanded, .section.expanded div.header.monospace {
+			&::before {
+				@include toggled-arrow;
+			}
 		}
 	}
 
 }
 
 .bubble-repeat-count, .console-warning-level::before, .error-icon-small:after, .console-error-level:before {
-	line-height: $main-px;
-	width: $main-px;
-	height: $main-px;
+	line-height: $err_dim;
+	width: $err_dim;
+	height: $err_dim;
 	color: $orange;
 	margin-top: 0px;
 	top: 0px;
-	font-size: 18px;
+	font-size: $err_icon_dim;
 }
 
 .bubble-repeat-count {
@@ -742,6 +915,22 @@ html .platform-mac .console-view {
 	line-height: $main-line-height;
     color: $red !important;
     font-weight: 400;
+}
+
+.console-status-bar, .console-filters-header {
+	flex: 0 0 $bigger-px;
+	.filter-bitset-filter li {
+		margin: auto 2px;
+		padding: 0px 5px;
+		text-shadow: none;
+		border-radius: 0px;
+	}
+
+	input.search-replace.toolbar-replace-control {
+		background: $background;
+		border: none;
+	}
+
 }
 
 /* Console End */
