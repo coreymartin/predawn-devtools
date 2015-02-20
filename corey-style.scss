@@ -1,10 +1,11 @@
-@function px($em, $base: $main-size) {
-    @return $em/1em * $base;
+@function px($em, $base: $main-size) { @return $em/1em * $base }
+@function img_url($file) {
+	@return url("chrome-extension://__MSG_@@extension_id__/images/" + $file);
+	// ^ refers to chrome extension folder, see http://stackoverflow.com/a/8864212
 }
 
 $light-white: rgb(229,229,229);
 $dark-white: rgb(145,145,145);
-$darker-white: rgb(94,94,94);
 
 $brown: #B88E74;
 $red: rgb(200, 93, 55);
@@ -38,10 +39,6 @@ $err_icon_dim: $err_dim - 2px;
 $glyph-color: $dark-white;
 $glyph-selected-color: $orange;
 
-@function img_url($file) {
-	@return url("chrome-extension://__MSG_@@extension_id__/images/" + $file);
-}
-
 $big_tabs: 38px;
 $unselected_tabs: darken($background, 10%);
 
@@ -71,6 +68,7 @@ $unselected_tabs: darken($background, 10%);
 @mixin toggled-arrow { -webkit-mask-position: -20px -90px }
 
 input, textarea { cursor: img_url("cursor.png") }
+::selection, ol.watch-expressions > li.hovered, .CodeMirror-selected { background: $selected !important; }
 
 html {
 	.styles-pane, .vbox.sources, .vbox.elements, .platform-mac .console-view, #drawer-tabbed-pane { /* only target the "Sources" and "Elements" panes */
@@ -89,8 +87,6 @@ html {
 	}
 }
 
-::selection, ol.watch-expressions > li.hovered, .CodeMirror-selected { background: $selected !important; }
-
 .child-editing { 
 	color: $light-white !important;
 }
@@ -102,34 +98,35 @@ html {
 	box-shadow: none;
 }
 
-.glyph { background-color: $glyph-color; opacity: 1 !important; top: 1px; }
-.glyph.shadow { display: none; }
-.emulation-status-bar-item .glyph { -webkit-mask-position: -163px 2px }
-.node-search-status-bar-item .glyph { -webkit-mask-position: -224px -23px }
-.scripts-debug-toolbar {
-	.glyph {
+/* Glyphs and icons */
+
+.glyph {
+	background-color: $glyph-color; 
+	opacity: 1 !important; 
+	top: 1px;
+	&.shadow { display: none; }
+	
+	/* Element inspector and emulation icons */
+	.emulation-status-bar-item & { -webkit-mask-position: -163px 2px }
+	.node-search-status-bar-item & { -webkit-mask-position: -224px -23px }
+	
+	/* Debug icon glyphs under Sources */
+	.scripts-debug-toolbar & {
 		height: 20px; // otherwise the other glyphs show below
 		bottom: 0px;
 		margin: auto;
 	}
-	.scripts-pause {
-		.glyph { -webkit-mask-position: -32px -75px }
-		&.toggled-on .glyph { -webkit-mask-position: 0 -75px }
-	}
-	.scripts-toggle-breakpoints {
-		.glyph { -webkit-mask-position: 0px -26px }
-		&.toggled-on .glyph { -webkit-mask-position: -32px -2px }
-	}
-	.scripts-step-over .glyph { -webkit-mask-position: -128px -75px }
-	.scripts-step-into .glyph { -webkit-mask-position: -64px -75px }
-	.scripts-step-out .glyph { -webkit-mask-position: -97px -75px }
-	.scripts-pause-on-exceptions-status-bar-item .glyph { -webkit-mask-position: -256px -2px }
-	.long-click-glyph.shadow {
-		top: 3px;
-		background-color: $glyph-color !important;
-		z-index: 1;
-	}
+	.scripts-pause & { -webkit-mask-position: -32px -75px }
+	.scripts-pause.toggled-on & { -webkit-mask-position: 0 -75px }
+	.scripts-toggle-breakpoints & { -webkit-mask-position: 0px -26px }
+	.scripts-toggle-breakpoints.toggled-on & { -webkit-mask-position: -32px -2px }
+	.scripts-step-over & { -webkit-mask-position: -128px -75px }
+	.scripts-step-into & { -webkit-mask-position: -64px -75px }
+	.scripts-step-out &  { -webkit-mask-position: -97px -75px }
+	.scripts-pause-on-exceptions-status-bar-item & { -webkit-mask-position: -256px -2px }
+
 }
+
 button.status-bar-item, div.status-bar-item {
 	padding:0;
 	height: $bigger-px;
@@ -139,11 +136,37 @@ button.status-bar-item, div.status-bar-item {
 	}
 	&.toggled-on .glyph:not(.shadow), &.toggled-shown .glyph { background-color: $glyph-selected-color !important }
 }
+
 .status-bar-item {
 	vertical-align: top;
+	color: $glyph-color !important;
+	text-shadow: none !important;
+	&.select { margin-right: -13px; }
+	.search-bar & {
+		width: initial; height: initial;
+		.status-bar-button-text { line-height: $bigger-px; }
+	}
 	.status-bar-counter-item  {
 		vertical-align: top;
 	}
+}
+
+.scripts-debug-toolbar {
+	.long-click-glyph.shadow {
+		top: 3px;
+		background-color: $glyph-color !important;
+		z-index: 1;
+	}
+}
+
+.error-icon-small {
+	background-image: none;
+	position: relative;
+}
+
+.object-info-state-note {
+	background-color: $glyph-selected-color;
+	&::before { color: $background; font-weight: 800 !important }
 }
 
 .swatch { 
@@ -272,7 +295,6 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			float: left;
 			padding: 4px;
 		}
-		@warn img_url("domain.png");
 		.navigator-domain-tree-item .icon { content: img_url("domain.png") }
 		.navigator-folder-tree-item .icon { content: img_url("folder.png"); opacity: 1 }
 		li {
@@ -319,10 +341,6 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			height: $bigger-px;
 			width: initial;
 		}
-		.status-bar-item { width: initial; height: initial }
-		.status-bar-item .status-bar-button-text {
-			line-height: $bigger-px;
-		}
 		.search-results-matches { font-size: $main-size; }
 		.toolbar-search-navigation {
 			&.toolbar-search-navigation-next, &.toolbar-search-navigation-prev {
@@ -352,16 +370,10 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 	}
 }
 
-.error-icon-small {
-	background-image: none;
-	position: relative;
-}
-
 .sources-status-bar {
 	@include main-content-footer;
 	background: none !important;
 	border-top: $darker-thin-lines !important;
-
 }
 
 html /deep/ .popover.platform-mac, html #glass-pane {
@@ -673,14 +685,60 @@ html /deep/ {
 
 		}
 
-		.metrics-and-computed .metrics { border-bottom: $darker-thin-lines !important; }
-
-		.metrics {
-			color: $background !important;
-			font-weight: normal !important;
-		}
 	}
 
+}
+
+.metrics-and-computed .metrics { border-bottom: $darker-thin-lines !important; }
+
+.metrics {
+	color: $background !important;
+	font-weight: normal !important;
+	div.label { transition: color 0.25s linear; }
+	.position, .margin, .border, .padding, .content { 
+		background-color: $background !important;
+		border-color: darken($dark-white, 20%) !important; 
+		border-style: dotted !important;
+		transition: border 0.25s linear;
+	}
+	.position { color: $dark-white }
+	.margin { color: $orange }
+	.border { color: $yellow }
+	.padding { color: $string }
+	.content { color: $blue }
+	@mixin metrics($color, $border-style) {
+		border: 1px $border-style $color !important;
+		&, & div.label { color: $color !important }
+	}
+	@mixin metric-hover($color) {
+		border-color: $color !important;
+		&, & > div.label { color: $color !important }
+	}
+	@mixin no-hover($color) {
+		border-color: $dark-white !important; 
+		&, & > div.label { color: $dark-white !important }
+	}
+	&:hover {
+		.position { @include metrics($dark-white, dotted); }
+		.margin { @include metrics($orange, dotted); &:hover { @include metric-hover($orange) } }
+		.border { @include metrics($yellow, dotted); &:hover { @include metric-hover($yellow) } }
+		.padding { @include metrics($string, dotted); &:hover { @include metric-hover($string) } }
+		.content { @include metrics($blue, dotted); &:hover { @include metric-hover($blue) } }
+		&, .position:hover {
+			.margin { @include metric-hover($orange) }
+			.border { @include metric-hover($yellow) }
+			.padding { @include metric-hover($string) }
+			.content { @include metric-hover($blue) }
+			.margin:hover {
+				.border { @include no-hover($yellow) }
+				.padding { @include no-hover($string) }
+				.content { @include no-hover($blue) }
+				.border:hover { @include metric-hover($yellow) }
+				.padding:hover { @include metric-hover($string) }
+				.content:hover { @include metric-hover($blue) }
+			}
+		}
+	}
 }
 
 body, body /deep/ {
@@ -744,35 +802,6 @@ body, body /deep/ {
 	border-top: $darker-thin-lines !important;
 }
 
-// .close-button-gray:hover {
-// }
-// .close-button-gray {
-// 	background: none;
-// }
-// .close-button, .close-button-gray {
-// 	&:before {
-// 		content: "×";
-// 		color: $orange;
-// 		font-size: 12px;
-// 	}
-// 	background: none;
-// 	background-size: 320px 144px;
-// 	display: inline-block;
-// }
-
-/* Console Start */
-
-.status-bar-item.console-context {
-	margin-left: 0;
-	margin-right: -16px;
-	background: $unselected_tabs 
-}
-
-.status-bar-item.checkbox {
-	margin-top: 0px;
-	margin-left: 3px;
-}
-
 html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 
 	color: $light-white !important;
@@ -793,6 +822,7 @@ html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 	}
 
 	.console-formatted-array {
+		color: $light-white;
 		.console-formatted-node:hover {
 			background-color: rgba(0,0,0,0);
 		}
@@ -806,8 +836,13 @@ html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 		color: $red;
 	}
 
-	.console-group-messages .outline-disclosure, .console-group-messages .outline-disclosure ol {
-		line-height: $main-line-height;
+	.console-group-messages {
+		.section > .header .title { 
+			color: $light-white;
+			line-height: $main-line-height;
+			font-weight: $main-font-weight;
+		}
+		.outline-disclosure { &, & ol { line-height: $main-line-height } }
 	}
 
 	#console-messages {
@@ -831,19 +866,6 @@ html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 		.console-message, .console-user-command, .console-object-preview {
 			min-height: $main-line-height;
 			line-height: $main-line-height;
-		}
-	}
-
-	.status-bar-item { //prepend select?
-		$subtle-gray: rgb(136, 136, 136);
-		&.select { margin-right: -13px; }
-		color: $subtle-gray !important;
-		text-shadow: none !important;
-		& > .glyph {
-			.status-bar-item > .glyph {
-				opacity: 0.3;
-				background-color: white;
-			}
 		}
 	}
 
@@ -918,12 +940,28 @@ html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 }
 
 .console-status-bar, .console-filters-header {
-	flex: 0 0 $bigger-px;
+	$height: $bigger-px;
+	flex: 0 0 $height;
 	.filter-bitset-filter li {
 		margin: auto 2px;
 		padding: 0px 5px;
 		text-shadow: none;
 		border-radius: 0px;
+	}
+
+	.status-bar-item.console-context {
+		margin-left: 0;
+		margin-right: -16px;
+		background: $unselected_tabs;
+		height: $height;
+	}
+
+	.status-bar-item.checkbox {
+		margin-top: 0px;
+		margin-left: 3px;
+		margin-bottom: 0px;
+		line-height: $height;
+		input { top: 8px }
 	}
 
 	input.search-replace.toolbar-replace-control {
