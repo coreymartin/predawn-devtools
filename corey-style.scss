@@ -729,10 +729,11 @@ html /deep/ {
 			}
 
 			.styles-element-state-pane {
-				$state-height: 80px;
+				$state-height: 85px;
 				height: $state-height;
-				// margin-top: -1 * $state-height;
 				border-bottom: $darker-thin-lines;
+				margin-top: -62px;
+				&.expanded { margin-top: 0; }
 			}
 
 		}
