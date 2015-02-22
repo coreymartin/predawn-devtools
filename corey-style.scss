@@ -56,7 +56,7 @@ $big_tabs: 38px;
 	-webkit-mask-image: url(Images/statusbarButtonGlyphs.png);
 	-webkit-mask-size: 320px 144px;
 	-webkit-mask-position: -4px -91px;
-	background-color: $glyph-color;
+	background-color: $glyph-color !important;
 	background-position: initial !important;
 	opacity:1 !important;
 	width: 8px !important;
