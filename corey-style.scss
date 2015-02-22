@@ -268,15 +268,14 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 			font-weight: 100;
 			line-height: 7px;
 			border-radius: 50%;
-			color: $light-white;
-			border: 1px $dark-white solid;
+			background: $darker-bg;
+			border: 1px darken($dark-white, 20%) solid;
 		}
 		&:hover:after {  }
 		&:checked:after { 
-			content: ""; 
-			background-color: rgba($light-white, 0.9);
-			border-color: $dark-white; 
-			box-shadow: 0px 0px 0px 1px black inset; 
+			content: "";
+			background-color: darken($purple, 25%);
+			border-color: darken($purple, 25%);
 		}
 		&.enabled-button { left: -38px; }
 	}
