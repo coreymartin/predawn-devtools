@@ -37,7 +37,7 @@ $darker-thin-lines: $darker-width dotted rgb(50,50,50);
 $err_dim: $main-px;
 $err_icon_dim: $err_dim - 2px;
 
-$glyph-color: $dark-white;
+$glyph-color: darken($dark-white, 20%);
 $glyph-selected-color: $orange;
 
 $big_tabs: 38px;
