@@ -14,6 +14,7 @@ $purple: rgb(154,132,158);
 $orange: rgb(241,130,95);
 $blue: rgb(117, 135, 166);
 $background: rgb(40,40,40);
+$darker-bg: darken($background, 10%);
 $slightly-lighter: lighten($background, 2%);
 $yellow: rgb(224, 197, 137);
 $js-keyword: rgb(249, 238, 152);
@@ -40,7 +41,6 @@ $glyph-color: $dark-white;
 $glyph-selected-color: $orange;
 
 $big_tabs: 38px;
-$unselected_tabs: darken($background, 10%);
 
 @mixin main-content-footer($font-size:$sub-size) {
 	flex-basis: $big_tabs !important;
@@ -186,9 +186,8 @@ button.status-bar-item, div.status-bar-item {
 
 #drawer-contents, .vbox.sources, .vbox.elements, .toolbar, #sources-panel-sources-view, 
 .panel.sources .navigator-tabbed-pane {
-
 	.tabbed-pane-header { 
-		background-color: $unselected_tabs !important;
+		background-color: $darker-bg !important;
 		border-bottom: none;
 		@include main-content-footer;
 		.tabbed-pane-header-contents { margin: 0 }
@@ -218,7 +217,7 @@ button.status-bar-item, div.status-bar-item {
 .toolbar {
 	* { font-family: 'Source Code Pro' !important; }
 	padding: 0;
-	background: $unselected_tabs;
+	background: $darker-bg;
 	border-bottom: none;
 	@include main-content-footer($font-size:$main-size);
 	.tabbed-pane-header {
@@ -231,7 +230,7 @@ button.status-bar-item, div.status-bar-item {
 	.toolbar-controls-left, .toolbar-controls-right {
 		opacity: 1;
 		margin: 0;
-		background: $unselected_tabs;
+		background: $darker-bg;
 	}
 }
 
@@ -314,7 +313,7 @@ li.overloaded, .styles-section .properties .has-ignorable-error {
 		$extra-space: 15px;
 		$per-side: $extra-space/2;
 		$search-height: $bigger-px + $extra-space;
-		background: $unselected_tabs;
+		background: $darker-bg;
 		height: $search-height;
 		flex: 0 0 $search-height;
 		line-height: $search-height;
@@ -947,7 +946,7 @@ html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 	.status-bar-item.console-context {
 		margin-left: 0;
 		margin-right: -16px;
-		background: $unselected_tabs;
+		background: $darker-bg;
 		height: $height;
 	}
 
