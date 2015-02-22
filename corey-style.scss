@@ -34,13 +34,13 @@ $thin-lines: 1px solid rgb(120,120,120);
 $darker-width: 1px;
 $darker-thin-lines: $darker-width dotted rgb(50,50,50);
 
-$err_dim: $main-px;
-$err_icon_dim: $err_dim - 2px;
-
 $glyph-color: darken($dark-white, 20%);
 $glyph-selected-color: $orange;
 
 $big_tabs: 38px;
+
+$err_dim: $main-px;
+$err_icon_dim: $err_dim - 10px;
 
 @mixin main-content-footer($font-size:$sub-size) {
 	flex-basis: $big_tabs !important;
@@ -66,6 +66,34 @@ $big_tabs: 38px;
 	top: 0px;
 }
 @mixin toggled-arrow { -webkit-mask-position: -20px -90px }
+
+@mixin note($color) {
+	line-height: $err_dim !important;
+	width: $err_dim;
+	height: $err_dim !important;
+	color: $color !important;
+	margin-top: 0px;
+	top: 0px;
+	font-size: $err_icon_dim;
+	background-color: transparent !important;
+	&:hover { color: lighten($color, 10%) !important }
+}
+
+@mixin x($ba, $color) {
+	@include note($color);
+	background-image: none;
+	&:#{$ba} {
+		font-family: 'Source Code Pro';
+		content: "✕";
+		position: absolute;
+		font-weight: 100;
+		background-image: none;
+		width:10px;
+		height: $err_icon_dim;
+		top: 0; bottom: 0; left: 0; right: 0;
+		margin: auto;
+	}
+}
 
 input, textarea { cursor: img_url("cursor.png") }
 ::selection, ol.watch-expressions > li.hovered, .CodeMirror-selected { background: $selected !important; }
@@ -125,16 +153,6 @@ html {
 	.scripts-step-out &  { -webkit-mask-position: -97px -75px }
 	.scripts-pause-on-exceptions-status-bar-item & { -webkit-mask-position: -256px -2px }
 
-}
-
-button.status-bar-item, div.status-bar-item {
-	padding:0;
-	height: $bigger-px;
-	.status-bar-counter-item > div {
-		vertical-align: 1px;
-		margin-right: 5px;
-	}
-	&.toggled-on .glyph:not(.shadow), &.toggled-shown .glyph { background-color: $glyph-selected-color !important }
 }
 
 .status-bar-item {
@@ -198,14 +216,50 @@ button.status-bar-item, div.status-bar-item {
 			height: $big_tabs;
 			width: initial !important;
 			font-weight: $main-font-weight;
+			.close-button, .close-button-gray { @include x(before, darken($dark-white, 20%)); }
 			&.selected { 
 				background: $background;
 				.tabbed-pane-header-tab-title { color: $light-white }
 			}
 		}
 	}
-
 }
+
+/* sources file title tabs */
+
+$source-title-tab-indent: 22px;
+
+#sources-panel-sources-view {	
+	.tabbed-pane-header-contents {
+		margin: 0 $source-title-tab-indent !important;
+	}
+}
+
+button.status-bar-item, div.status-bar-item {
+	padding:0;
+	height: $bigger-px;
+	.status-bar-counter-item > div {
+		vertical-align: 1px;
+		margin-right: 5px;
+	}
+	&.toggled-on .glyph:not(.shadow), &.toggled-shown .glyph { background-color: $glyph-selected-color !important }
+	&.sidebar-show-hide-button  {
+		height: $big_tabs;
+		top: 0 !important;
+		& > .glyph {
+			top: 0; bottom: 0; left: 0; right: 0;
+			margin: auto;
+		}
+		 &.toggled-show, &.toggled-hide { & > .glyph { @include arrow } }
+		 &.toggled-hide.left-sidebar-show-hide-button > .glyph { transform: rotateZ(180deg) }
+		 &.toggled-show.right-sidebar-show-hide-button > .glyph { transform: rotateZ(180deg) }
+		 &.toggled-hide.right-sidebar-show-hide-button { margin-right: 0 !important }
+	}
+}
+
+.panel.sources .split-view.hbox #scripts-debug-sidebar-resizer-widget { display: none; }
+
+/* end sources file title tabs */
 
 #drawer-contents {
 	.tabbed-pane-header { 
@@ -890,22 +944,17 @@ html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 
 }
 
-.bubble-repeat-count, .console-warning-level::before, .error-icon-small:after, .console-error-level:before {
-	line-height: $err_dim;
-	width: $err_dim;
-	height: $err_dim;
-	color: $orange;
-	margin-top: 0px;
-	top: 0px;
-	font-size: $err_icon_dim;
+.bubble-repeat-count.debug, 
+.console-debug-level .bubble-repeat-count, 
+.console-warning-level:before, 
+.error-icon-small:after,
+.bubble-repeat-count.error, 
+.console-error-level .bubble-repeat-count,
+.console-error-level:before {
+	@include note($orange);
 }
 
-.bubble-repeat-count {
-	background: none;
-	font-weight: $main-font-weight;
-	padding-left: 3px;
-	font-size: 14px;
-}
+.console-error-level:before { right: initial !important }
 
 .console-warning-level, .warning-icon-small {
 	background-image: none;
@@ -918,13 +967,8 @@ html .platform-mac .console-view, .vbox.sources, .vbox.elements {
 	}
 }
 
-.error-icon-small:after, .console-error-level:before {
-	font-family: 'Source Code Pro';
-	content: "x";
-	position: absolute;
-	font-weight: 100;
-	background-image: none;
-}
+.error-icon-small { @include x(after, $orange) }
+.console-error-level { @include x(before, $orange) }
 
 .console-error-level .console-message-text, .console-error-level .section > .header .title, .section .properties .value.error {
 	line-height: $main-line-height;
