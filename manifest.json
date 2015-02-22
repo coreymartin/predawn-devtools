@@ -1,6 +1,7 @@
 {
-  "name": "Corey DevTools Theme",
+  "name": "Predawn DevTools Theme",
   "version": "1",
-  "devtools_page": "corey-custom-devtools.html",
-  "manifest_version": 2
+  "devtools_page": "predawn.html",
+  "manifest_version": 2,
+  "author": "Corey Martin" 
 }

@@ -11,7 +11,7 @@ module.exports = function(grunt) {
           trace:false
         },
         files: {
-          'corey-style.css' : 'corey-style.scss'
+          'predawn.css' : 'predawn.scss'
         }
       }
     },

@@ -14,4 +14,4 @@ var loadResource = function(resource, onload) {
         chrome.devtools.panels.applyStyleSheet(this.responseText);
     };
 
-loadResource('corey-style.css', applyStyleSheet);
+loadResource('predawn.css', applyStyleSheet);
