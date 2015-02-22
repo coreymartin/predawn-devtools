@@ -729,14 +729,9 @@ html /deep/ {
 			.border { @include metric-hover($yellow) }
 			.padding { @include metric-hover($string) }
 			.content { @include metric-hover($blue) }
-			.margin:hover {
-				.border { @include no-hover($yellow) }
-				.padding { @include no-hover($string) }
-				.content { @include no-hover($blue) }
-				.border:hover { @include metric-hover($yellow) }
-				.padding:hover { @include metric-hover($string) }
-				.content:hover { @include metric-hover($blue) }
-			}
+		}
+		.margin:hover { 
+			@include metric-hover($orange) 
 		}
 	}
 }
